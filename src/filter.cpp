@@ -60,7 +60,7 @@ void Log2File(const char *outputpath,int dir,int exectime)
 	}
 	else
 	{
-		logfile.open(outputpath,ios::trunc‎);
+		logfile.open(outputpath,ios::trunc);
 		logoutput << "BuiildFilter Time:" << exectime << " ms" << endl;
 	}
 	std::memset(Outstr, 0, sizeof(char) * logoutput.str().length());
@@ -229,27 +229,15 @@ void ProfanitiesRemove(char *input,char *outputpath, Node *root)
 	Log2File(outputpath,Removepro,exectime);
 }
 
-void AddFilterlst(const char *path)
+void AddFilterlst(const char *path,char *input)
 {
-	char input[512];
-
-	while (true)
-	{
 		ofstream Modifyfilestream;
 		std::memset(input, 0, sizeof(char) * 512);
 		cin.getline(input, 512);
-		if (strcmp(input, "#complete") == 0)
-			break;
-		else if (strncmp(input, "#", 1))
-		{
-			Modifyfilestream.open(path, ios::app);
-			input[strlen(input)] = '\n';
-			Modifyfilestream.write(input, strlen(input));
-			Modifyfilestream.close();
-		}
-		else
-			cout << "type\"#complete\" to leave add mode!!" << endl;
-	}
+		Modifyfilestream.open(path, ios::app);
+		input[strlen(input)] = '\n';
+		Modifyfilestream.write(input, strlen(input));
+		Modifyfilestream.close();
 }
 
 int main(int argc, char *argv[])
@@ -259,31 +247,42 @@ int main(int argc, char *argv[])
 	root = SliceFilterlst(argv[1],argv[3]);
 	ifstream Testcase;
 	Testcase.open(argv[2], ios::in);
+  stringstream line;
 	char input[512];
 	std::memset(input, 0, sizeof(char) * 512);
-	while (input=Testcase.get();)
+	while(1)
 	{
-		if (strcmp(input, "#terminate") == 0)
+    //memcpy(input, line.str().c_str(), line.str().length());
+    Testcase.getline(input,sizeof(input));
+		if(strcmp(input, "#terminate") == 0)
 		{
 			break;
 		}
 		else if (strcmp(input, "#add") == 0)
 		{
-			AddFilterlst(argv[1]);
-			FreeNodeTree(root);
-			root = SliceFilterlst(argv[1],argv[3]);
+     Testcase.getline(input,sizeof(input));
+     while(1){
+		 if (strcmp(input, "#complete") == 0){
+  			FreeNodeTree(root);
+			  root = SliceFilterlst(argv[1],argv[3]);
+        break;
+     }
+     else if (strncmp(input, "#", 1))
+			AddFilterlst(argv[1],input);
+     }
 		}
-		else if (strncmp(input, "#", 1))
+		else if (strncmp(input, "#", 1)==0)
 		{
-			ProfanitiesRemove(input,argv[3], root);
+		  cout << "type\"#terminate\" to leave add mode!!" << endl;
+			cout << "type\"#add\" to leave add mode!!" << endl;
 		}
 		else
 		{
-			cout << "type\"#terminate\" to leave add mode!!" << endl;
-			cout << "type\"#add\" to leave add mode!!" << endl;
+       ProfanitiesRemove(input,argv[3], root);
 		}
 		std::memset(input, 0, sizeof(char) * 512);
 	}
+  Testcase.close();
 	FreeNodeTree(root);
 	return 0;
 }
