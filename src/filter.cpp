@@ -49,22 +49,17 @@ Node *SearchNode(Node *current, char data)
 
 void Log2File(const char *outputpath,int dir,int exectime)
 {
-	stringstream logoutput;
 	ofstream logfile;
-	
-	char *Outstr = new char[logoutput.str().length()+ 1];
 	if(dir==Removepro)
 	{
 		logfile.open(outputpath,ios::app);
-		logoutput << "ProfanitiesRemove Time:" << exectime << " ms" << endl;
+		logfile << "ProfanitiesRemove Time:" << exectime << " ms" << endl;
 	}
 	else
 	{
 		logfile.open(outputpath,ios::trunc);
-		logoutput << "BuiildFilter Time:" << exectime << " ms" << endl;
+		logfile << "BuiildFilter Time:" << exectime << " ms" << endl;
 	}
-	std::memset(Outstr, 0, sizeof(char) * logoutput.str().length());
-	logfile.write(Outstr,sizeof(Outstr));
 	logfile.close();
 }
 //build filter
