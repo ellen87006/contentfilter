@@ -51,18 +51,21 @@ void Log2File(const char *outputpath,int dir,int exectime)
 {
 	stringstream logoutput;
 	ofstream logfile;
-	logfile.open(outputpath,ios::app);
+	
 	char *Outstr = new char[logoutput.str().length()+ 1];
 	if(dir==Removepro)
 	{
-		logfile << "ProfanitiesRemove Time:" << exectime << " ms" << endl;
+		logfile.open(outputpath,ios::app);
+		logoutput << "ProfanitiesRemove Time:" << exectime << " ms" << endl;
 	}
 	else
 	{
-		logfile << "BuiildFilter Time:" << exectime << " ms" << endl;
+		logfile.open(outputpath,ios::trunc‎);
+		logoutput << "BuiildFilter Time:" << exectime << " ms" << endl;
 	}
 	std::memset(Outstr, 0, sizeof(char) * logoutput.str().length());
 	logfile.write(Outstr,sizeof(Outstr));
+	logfile.close();
 }
 //build filter
 Node *SliceFilterlst(const char *path,const char *outputpath)
@@ -254,14 +257,12 @@ int main(int argc, char *argv[])
 
 	Node *root;
 	root = SliceFilterlst(argv[1],argv[3]);
-	while (true)
+	ifstream Testcase;
+	Testcase.open(argv[2], ios::in);
+	char input[512];
+	std::memset(input, 0, sizeof(char) * 512);
+	while (input=Testcase.get();)
 	{
-		char input[512];
-		std::memset(input, 0, sizeof(char) * 512);
-		ifstream Testcase;
-		Testcase.open(argv[2], ios::in);
-		Testcase.getline(input, 512);
-
 		if (strcmp(input, "#terminate") == 0)
 		{
 			break;
@@ -281,6 +282,7 @@ int main(int argc, char *argv[])
 			cout << "type\"#terminate\" to leave add mode!!" << endl;
 			cout << "type\"#add\" to leave add mode!!" << endl;
 		}
+		std::memset(input, 0, sizeof(char) * 512);
 	}
 	FreeNodeTree(root);
 	return 0;
