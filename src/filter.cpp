@@ -6,7 +6,8 @@
 #include <vector>
 #include <time.h>
 using namespace std;
-
+#define Buildfilter 1
+#define Removepro 2
 struct Node
 {
 	char data;
@@ -45,8 +46,26 @@ Node *SearchNode(Node *current, char data)
 	}
 	return 0;
 }
+
+void Log2File(const char *outputpath,int dir,int exectime)
+{
+	stringstream logoutput;
+	ofstream logfile;
+	logfile.open(outputpath,ios::app);
+	char *Outstr = new char[logoutput.str().length()+ 1];
+	if(dir==Removepro)
+	{
+		logfile << "ProfanitiesRemove Time:" << exectime << " ms" << endl;
+	}
+	else
+	{
+		logfile << "BuiildFilter Time:" << exectime << " ms" << endl;
+	}
+	std::memset(Outstr, 0, sizeof(char) * logoutput.str().length());
+	logfile.write(Outstr,sizeof(Outstr));
+}
 //build filter
-Node *SliceFilterlst(const char *path)
+Node *SliceFilterlst(const char *path,const char *outputpath)
 {
 	cout << "Please Wait....." << endl;
 	clock_t start_buildtree = clock();
@@ -121,12 +140,12 @@ Node *SliceFilterlst(const char *path)
 	}
 	FreeKeyWordList(list_keyword);
 	clock_t end_buildtree = clock();
-	cout << "BuildTreeTime:" << end_buildtree - start_buildtree << " ms" << endl
-		 << "Tree Build complete" << endl;
+	int exectime=end_buildtree - start_buildtree;
+	Log2File(outputpath,Buildfilter,exectime);
 	return root;
 }
 
-void ProfanitiesRemove(char *input, Node *root)
+void ProfanitiesRemove(char *input,char *outputpath, Node *root)
 {
 	clock_t ProfanitiesRemove_Start = clock();
 
@@ -203,7 +222,8 @@ void ProfanitiesRemove(char *input, Node *root)
 	}
 	cout << output << endl;
 	clock_t ProfanitiesRemove_End = clock();
-	cout << "ProfanitiesRemove Time:" << ProfanitiesRemove_End - ProfanitiesRemove_Start << " ms" << endl;
+	int exectime=ProfanitiesRemove_End - ProfanitiesRemove_Start;
+	Log2File(outputpath,Removepro,exectime);
 }
 
 void AddFilterlst(const char *path)
@@ -217,14 +237,15 @@ void AddFilterlst(const char *path)
 		cin.getline(input, 512);
 		if (strcmp(input, "#complete") == 0)
 			break;
-		else if (strncmp(input, "#",1)){
+		else if (strncmp(input, "#", 1))
+		{
 			Modifyfilestream.open(path, ios::app);
-		input[strlen(input)] = '\n';
-		Modifyfilestream.write(input, strlen(input));
-		Modifyfilestream.close();
+			input[strlen(input)] = '\n';
+			Modifyfilestream.write(input, strlen(input));
+			Modifyfilestream.close();
 		}
-		else 
-		cout << "type\"#complete\" to leave add mode!!" << endl;
+		else
+			cout << "type\"#complete\" to leave add mode!!" << endl;
 	}
 }
 
@@ -232,12 +253,14 @@ int main(int argc, char *argv[])
 {
 
 	Node *root;
-	root = SliceFilterlst(argv[1]);
+	root = SliceFilterlst(argv[1],argv[3]);
 	while (true)
 	{
 		char input[512];
 		std::memset(input, 0, sizeof(char) * 512);
-		cin.getline(input, 512);
+		ifstream Testcase;
+		Testcase.open(argv[2], ios::in);
+		Testcase.getline(input, 512);
 
 		if (strcmp(input, "#terminate") == 0)
 		{
@@ -247,11 +270,11 @@ int main(int argc, char *argv[])
 		{
 			AddFilterlst(argv[1]);
 			FreeNodeTree(root);
-			root = SliceFilterlst(argv[1]);
+			root = SliceFilterlst(argv[1],argv[3]);
 		}
-		else if (strncmp(input, "#",1))
+		else if (strncmp(input, "#", 1))
 		{
-			ProfanitiesRemove(input, root);
+			ProfanitiesRemove(input,argv[3], root);
 		}
 		else
 		{
