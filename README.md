@@ -10,7 +10,7 @@
     Test cases:
         Get profanities form https://raw.communitydragon.org/7.24/plugins/rcp-fe-language-filter/global/
         Addtional about 17K.
-        Test performance with shell-script.
+        Test performance output plot in linux.
         
 ### 3. Optimize 
 * 盡可能優化其記憶體使用量
