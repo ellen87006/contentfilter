@@ -80,10 +80,11 @@ void SliceFilterlst(const char *path,const char *outputpath,list<char *> list_ke
 void ProfanitiesRemove(char *input,char *outputpath, list<char *> list_keyword)
 {
 	clock_t ProfanitiesRemove_Start = clock();
-
-	Node *current = root->next_level;
 	int start = -1;
+    int i=0;
 	char output[512];
+   // char tmp[512];
+    stringstream tmp;
 	std::memset(output, 0, sizeof(char) * 512);
 	int lastNProfanities;
 	bool shouldReview = false;
@@ -91,9 +92,14 @@ void ProfanitiesRemove(char *input,char *outputpath, list<char *> list_keyword)
     {
 	for (list<char *>::iterator it_keyword = list_keyword.begin(); it_keyword != list_keyword.end(); ++it_keyword)
     {
-		if (strncmp(*it_keyword, input[i],it_keyword.str().length()) == 0)
+        const char* tmp2=*it_keyword;
+        tmp<<input[i];
+        char *tmp3 = new char[tmp.str().length()];
+       // char ch= input[i];
+        memcpy(tmp3, tmp.str().c_str(), tmp.str().length());
+		if (strncmp(tmp2, tmp3,strlen(tmp2)) == 0)
 			{
-				for(int j=0;j<it_keyword.str().length();j++)
+				for(int j=0;j<strlen(tmp2);j++)
                 {
                     cout <<"*";
                 }
@@ -120,9 +126,8 @@ void AddFilterlst(const char *path,char *input)
 
 int main(int argc, char *argv[])
 {
-
-	Node *root;
-	root = SliceFilterlst(argv[1],argv[3]);
+    list<char *> list_keyword;
+    SliceFilterlst(argv[1],argv[3],list_keyword);
 	ifstream Testcase;
 	Testcase.open(argv[2], ios::in);
   stringstream line;
@@ -141,8 +146,8 @@ int main(int argc, char *argv[])
      Testcase.getline(input,sizeof(input));
      while(1){
 		 if (strcmp(input, "#complete") == 0){
-  			FreeNodeTree(root);
-			  root = SliceFilterlst(argv[1],argv[3]);
+  			FreeKeyWordList(list_keyword);
+			  SliceFilterlst(argv[1],argv[3],list_keyword);
         break;
      }
      else if (strncmp(input, "#", 1))
@@ -156,11 +161,11 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-       ProfanitiesRemove(input,argv[3], root);
+       ProfanitiesRemove(input,argv[3], list_keyword);
 		}
 		std::memset(input, 0, sizeof(char) * 512);
 	}
   Testcase.close();
-	FreeNodeTree(root);
+	FreeKeyWordList(list_keyword);
 	return 0;
 }
