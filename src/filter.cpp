@@ -65,7 +65,7 @@ void Log2File(const char *outputpath,int dir,int exectime)
 //build filter
 Node *SliceFilterlst(const char *path,const char *outputpath)
 {
-	cout << "Please Wait....." << endl;
+	//cout << "Please Wait....." << endl;
 	clock_t start_buildtree = clock();
 	char *delim = new char[1];
 	delim[0] = '\n';
@@ -218,7 +218,7 @@ void ProfanitiesRemove(char *input,char *outputpath, Node *root)
 			output[j] = input[j];
 		}
 	}
-	cout << output << endl;
+	//cout << output << endl;
 	clock_t ProfanitiesRemove_End = clock();
 	int exectime=ProfanitiesRemove_End - ProfanitiesRemove_Start;
 	Log2File(outputpath,Removepro,exectime);
