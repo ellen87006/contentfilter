@@ -10,14 +10,10 @@
     Test cases:
         Get profanities form https://raw.communitydragon.org/7.24/plugins/rcp-fe-language-filter/global/
         Addtional about 17K.
-        Test performance output plot in linux.
-        
-### 3. Optimize 
-* 盡可能優化其記憶體使用量
-    * 分析即可，實作更佳
-* 更多您發揮創意想到的功能
-
-## 評估方式
-
-完成後請將專案程式碼連同設計及分析報告上傳 github 並回覆專案連結，我們團隊在下班之餘是群很認真經營 github 的人，故必會認真評估您的心血，期望能在一個禮拜內收到您的回覆。
+        Test performance with utils/testcase.txt  
+        Raspberry Pi 3 Model B+ with Linux raspberrypi 4.14.79-v7+.
+        ||| B-Tree Filter | Brute filter |
+        | ------ | ------ |------ |
+        | Pre Building Tree | 17970283 Tick  | 0 Tick |
+        | Sentence Average time |153 Tick |22010|
 
