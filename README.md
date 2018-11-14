@@ -13,7 +13,7 @@ Addtional about 17K.
 Test performance with utils/testcase.txt  
 Raspberry Pi 3 Model B+ with Linux raspberrypi 4.14.79-v7+.
 
-|\| B-Tree Filter | Brute filter |
+|| B-Tree Filter | Brute filter |
 | ------ | ------ |------ |
 | Pre Building Tree | 17970283 Tick  | 0 Tick |
 | Sentence Average time |153 Tick |22010|
