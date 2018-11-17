@@ -4,3 +4,4 @@ project (contentfilter)
 
 add_executable (contentfilter filter.cpp)
 add_executable (Bcontentfilter Brute.cpp)
+add_executable (Trie Trie.cpp)

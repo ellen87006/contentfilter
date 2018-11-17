@@ -6,17 +6,17 @@
 #include <vector>
 #include <time.h>
 using namespace std;
-#define TREE_WIDTH 256
+#define TREE_WIDTH 257
 #define Buildfilter 1
 #define Removepro 2
-struct Node
+struct FilterNode
 {
 	char data;
 	bool last;
-	struct Node *next[TREE_WIDTH];
+	struct FilterNode *next[TREE_WIDTH];
 };
 //free resources
-void FreeNodeTree(Node *root)
+void FreeNodeTree(FilterNode *root)
 {
 
 	for (int i = 0; i < TREE_WIDTH; i++)
@@ -27,17 +27,10 @@ void FreeNodeTree(Node *root)
 			root->next[i] = NULL;
 		}
 		else
-			delete root;
+			free(root);
 	}
 }
 
-void FreeKeyWordList(list<char *> &list_input)
-{
-	for (list<char *>::iterator it_key = list_input.begin(); it_key != list_input.end(); ++it_key)
-	{
-		delete *it_key;
-	}
-}
 void Log2File(const char *outputpath, int dir, int exectime)
 {
 	ofstream logfile;
@@ -54,7 +47,7 @@ void Log2File(const char *outputpath, int dir, int exectime)
 	logfile.close();
 }
 //build filter
-Node *SliceFilterlst(const char *path, const char *outputpath)
+FilterNode *SliceFilterlst(const char *path, const char *outputpath)
 {
 	//cout << "Please Wait....." << endl;
 	clock_t start_buildtree = clock();
@@ -65,94 +58,96 @@ Node *SliceFilterlst(const char *path, const char *outputpath)
 	FilterFileStream.open(path, ios::in);
 	RowFilter << FilterFileStream.rdbuf();
 	FilterFileStream.close();
-	// read filter file complete
+	cout << "read filter file complete" << endl;
 	char *Filter = new char[RowFilter.str().length() + 1];
 	std::memset(Filter, 0, sizeof(char) * RowFilter.str().length());
 	memcpy(Filter, RowFilter.str().c_str(), RowFilter.str().length());
-	list<char *> list_keyword;
-	list<char *>::iterator it_keyword;
 	// profanities list
-	Node *root = new Node();
+	struct FilterNode *root = new FilterNode;
+	struct FilterNode *gg = new FilterNode;
 	root->next[TREE_WIDTH] = 0;
+	std::memset(root->next, 0, sizeof(struct FilterNode *) * TREE_WIDTH);
 	root->data = 0;
-	Node *current = root;
+	FilterNode *current = root;
 	char *FilterSegment = strtok(Filter, delim);
+
 	while (FilterSegment)
-	{
-		bool exist = false;
-		for (list<char *>::iterator it_keyword = list_keyword.begin(); it_keyword != list_keyword.end(); ++it_keyword)
+	{	
+		char output[strlen(FilterSegment)];
+		std::memset(output, 0, sizeof(char) * strlen(FilterSegment));
+		int length = strlen(FilterSegment);
+		for (int i = 0; i < length; i++)
 		{
-			if (strcmp(*it_keyword, FilterSegment) == 0)
+			int index = (unsigned char)FilterSegment[i];
+			if (index > 0 && index <= 255)
 			{
-				exist = true;
-				break;
-			}
-		}
-		if (!exist)
-		{
-			char *pushbuffer = new char[strlen(FilterSegment) + 1];
-			memcpy(pushbuffer, FilterSegment, strlen(FilterSegment));
-			pushbuffer[strlen(FilterSegment)] = 0;
-			list_keyword.push_back(pushbuffer);
-			int length = strlen(pushbuffer);
-			for (int i = 0; i < length; i++)
-			{
-				Node *node = current->next[pushbuffer[i]];
-				if (node == 0)
+				struct FilterNode *node = current->next[index];
+				if (!node)
 				{
-					node = new Node();
-					node->data = pushbuffer[i];
+					node = new FilterNode;
+					node->data = FilterSegment[i];
 					node->last = false;
-					node->next[TREE_WIDTH] = 0;
-					current->next[pushbuffer[i]] = node;
+					std::memset(node->next, 0, sizeof(struct FilterNode *) * TREE_WIDTH);
+					current->next[index] = node;
 				}
 				current = node;
 			}
-
-			current->last = true;
-			current = root;
+			else
+			{
+			}
 		}
+		current->last = true;
+		current = root;
 		FilterSegment = strtok(NULL, delim);
 	}
-	FreeKeyWordList(list_keyword);
+	//FreeKeyWordList(list_keyword);
 	clock_t end_buildtree = clock();
 	int exectime = end_buildtree - start_buildtree;
+
 	Log2File(outputpath, Buildfilter, exectime);
+
 	return root;
 }
 
-void ProfanitiesRemove(char *input, char *outputpath, Node *root)
+void ProfanitiesRemove(char *input, char *outputpath, struct FilterNode *root)
 {
 	clock_t ProfanitiesRemove_Start = clock();
-	Node *current = root;
+
 	int start = -1;
 	char output[512];
 	std::memset(output, 0, sizeof(char) * 512);
 	int lastNProfanities;
 	bool shouldReview = false;
-	for (int i = 0; i < strlen(input); i++)
-	{
+	//cout<< '*';
+	bool hasfind = false, finding = false;
+	for (int i = 0; i < strlen(input);)
+	{	
+		bool hit=false;
+		struct FilterNode *current = root;
+		int index = (unsigned char)input[i];
+		start=i;
+		while(current->next[index])
+		{	
+			current=current->next[index];
+			output[start]='*';
+			start++;
+			index = (unsigned char)input[start];
+			
+			if(!current->next[index])
+			{
+				if(current->last)
+				{
+					hit=true;
+					output[start]='*';
+					i=start;
 
-		bool hasfind = false;
-		char ch = input[i];
-
-		while (current != 0)
-		{
-			if (current->next[input[i]] == 0 && current->last == 1)
-				hasfind = true;
-			current = current->next[input[i]];
-			output[i] = '*';
+				}
+				break;
+			}
 		}
-
-		if (!hasfind)
-		{
-
-			output[i] = input[i];
-		}
-		current = root;
+		output[i]=input[i];
+		i++;
 	}
-
-	cout << output << endl;
 	clock_t ProfanitiesRemove_End = clock();
 	int exectime = ProfanitiesRemove_End - ProfanitiesRemove_Start;
 	Log2File(outputpath, Removepro, exectime);
@@ -172,7 +167,7 @@ void AddFilterlst(const char *path, char *input)
 int main(int argc, char *argv[])
 {
 
-	Node *root;
+	struct FilterNode *root;
 	root = SliceFilterlst(argv[1], argv[3]);
 	ifstream Testcase;
 	Testcase.open(argv[2], ios::in);
