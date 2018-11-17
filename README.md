@@ -1,6 +1,6 @@
 # contentfilter
 ### 1. Implement
-Filter tree with binary tree.
+##Filter tree with binary tree.
 
 Time complixity :
 
@@ -9,7 +9,17 @@ Time complixity :
   - Remove Profanities: O (n^2) n = size of character
 
   - Space complixity :O(2n) 
+  
 
+##Filter tree with Trie.
+
+Time complixity :
+
+  - Building filter : O(n)  n = quantity of Profanities
+
+  - Remove Profanities: O (n) n = size of input character
+
+  - Space complixity :O(n) 
 ### 2. Benchmark
 Test cases:
 
