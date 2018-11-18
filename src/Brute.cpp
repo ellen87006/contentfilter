@@ -35,7 +35,7 @@ void Log2File(const char *outputpath, int dir, int exectime)
 //build filter
 void SliceFilterlst(const char *path, const char *outputpath, char *input)
 {
-   // cout << "Please Wait....." << endl;
+    // cout << "Please Wait....." << endl;
     clock_t start_buildtree = clock();
     char *delim = new char[1];
     delim[0] = '\n';
@@ -55,19 +55,19 @@ void SliceFilterlst(const char *path, const char *outputpath, char *input)
     {
         int hit = 0;
         char *FilterSegment = strtok(Filter, delim);
-        while(FilterSegment)
+        while (FilterSegment)
         {
-            
-            if(i+strlen(FilterSegment)< strlen(input)){
-            char tmp[(strlen(FilterSegment))];
-            memcpy(tmp, input+i, sizeof(char) * (strlen(FilterSegment)));
-            if (strcmp(tmp, FilterSegment) == 0)
-            {  
-                hit = strlen(FilterSegment);
+
+            if (i + strlen(FilterSegment) < strlen(input))
+            {
+                char tmp[(strlen(FilterSegment))];
+                memcpy(tmp, input + i, sizeof(char) * (strlen(FilterSegment)));
+                if (strcmp(tmp, FilterSegment) == 0)
+                {
+                    hit = strlen(FilterSegment);
+                }
             }
-            
-            }
-          
+
             FilterSegment = strtok(NULL, delim);
         }
         if (hit == 0)
@@ -76,8 +76,7 @@ void SliceFilterlst(const char *path, const char *outputpath, char *input)
         }
         else
         {
-             i += hit;
-           
+            i += hit;
         }
     }
     clock_t end_buildtree = clock();

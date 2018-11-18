@@ -47,23 +47,23 @@ Node *SearchNode(Node *current, char data)
 	return 0;
 }
 
-void Log2File(const char *outputpath,int dir,int exectime)
+void Log2File(const char *outputpath, int dir, int exectime)
 {
 	ofstream logfile;
-	if(dir==Removepro)
+	if (dir == Removepro)
 	{
-		logfile.open(outputpath,ios::app);
+		logfile.open(outputpath, ios::app);
 		logfile << "ProfanitiesRemove Time:" << exectime << " ms" << endl;
 	}
 	else
 	{
-		logfile.open(outputpath,ios::trunc);
+		logfile.open(outputpath, ios::trunc);
 		logfile << "BuiildFilter Time:" << exectime << " ms" << endl;
 	}
 	logfile.close();
 }
 //build filter
-Node *SliceFilterlst(const char *path,const char *outputpath)
+Node *SliceFilterlst(const char *path, const char *outputpath)
 {
 	//cout << "Please Wait....." << endl;
 	clock_t start_buildtree = clock();
@@ -138,12 +138,12 @@ Node *SliceFilterlst(const char *path,const char *outputpath)
 	}
 	FreeKeyWordList(list_keyword);
 	clock_t end_buildtree = clock();
-	int exectime=end_buildtree - start_buildtree;
-	Log2File(outputpath,Buildfilter,exectime);
+	int exectime = end_buildtree - start_buildtree;
+	Log2File(outputpath, Buildfilter, exectime);
 	return root;
 }
 
-void ProfanitiesRemove(char *input,char *outputpath, Node *root)
+void ProfanitiesRemove(char *input, char *outputpath, Node *root)
 {
 	clock_t ProfanitiesRemove_Start = clock();
 
@@ -220,64 +220,66 @@ void ProfanitiesRemove(char *input,char *outputpath, Node *root)
 	}
 	//cout << output << endl;
 	clock_t ProfanitiesRemove_End = clock();
-	int exectime=ProfanitiesRemove_End - ProfanitiesRemove_Start;
-	Log2File(outputpath,Removepro,exectime);
+	int exectime = ProfanitiesRemove_End - ProfanitiesRemove_Start;
+	Log2File(outputpath, Removepro, exectime);
 }
 
-void AddFilterlst(const char *path,char *input)
+void AddFilterlst(const char *path, char *input)
 {
-		ofstream Modifyfilestream;
-		std::memset(input, 0, sizeof(char) * 512);
-		cin.getline(input, 512);
-		Modifyfilestream.open(path, ios::app);
-		input[strlen(input)] = '\n';
-		Modifyfilestream.write(input, strlen(input));
-		Modifyfilestream.close();
+	ofstream Modifyfilestream;
+	std::memset(input, 0, sizeof(char) * 512);
+	cin.getline(input, 512);
+	Modifyfilestream.open(path, ios::app);
+	input[strlen(input)] = '\n';
+	Modifyfilestream.write(input, strlen(input));
+	Modifyfilestream.close();
 }
 
 int main(int argc, char *argv[])
 {
 
 	Node *root;
-	root = SliceFilterlst(argv[1],argv[3]);
+	root = SliceFilterlst(argv[1], argv[3]);
 	ifstream Testcase;
 	Testcase.open(argv[2], ios::in);
-  stringstream line;
+	stringstream line;
 	char input[512];
 	std::memset(input, 0, sizeof(char) * 512);
-	while(1)
+	while (1)
 	{
-    //memcpy(input, line.str().c_str(), line.str().length());
-    Testcase.getline(input,sizeof(input));
-		if(strcmp(input, "#terminate") == 0)
+		//memcpy(input, line.str().c_str(), line.str().length());
+		Testcase.getline(input, sizeof(input));
+		if (strcmp(input, "#terminate") == 0)
 		{
 			break;
 		}
 		else if (strcmp(input, "#add") == 0)
 		{
-     Testcase.getline(input,sizeof(input));
-     while(1){
-		 if (strcmp(input, "#complete") == 0){
-  			FreeNodeTree(root);
-			  root = SliceFilterlst(argv[1],argv[3]);
-        break;
-     }
-     else if (strncmp(input, "#", 1))
-			AddFilterlst(argv[1],input);
-     }
+			Testcase.getline(input, sizeof(input));
+			while (1)
+			{
+				if (strcmp(input, "#complete") == 0)
+				{
+					FreeNodeTree(root);
+					root = SliceFilterlst(argv[1], argv[3]);
+					break;
+				}
+				else if (strncmp(input, "#", 1))
+					AddFilterlst(argv[1], input);
+			}
 		}
-		else if (strncmp(input, "#", 1)==0)
+		else if (strncmp(input, "#", 1) == 0)
 		{
-		  cout << "type\"#terminate\" to leave add mode!!" << endl;
+			cout << "type\"#terminate\" to leave add mode!!" << endl;
 			cout << "type\"#add\" to leave add mode!!" << endl;
 		}
 		else
 		{
-       ProfanitiesRemove(input,argv[3], root);
+			ProfanitiesRemove(input, argv[3], root);
 		}
 		std::memset(input, 0, sizeof(char) * 512);
 	}
-  Testcase.close();
+	Testcase.close();
 	FreeNodeTree(root);
 	return 0;
 }

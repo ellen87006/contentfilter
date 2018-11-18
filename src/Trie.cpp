@@ -26,9 +26,8 @@ void FreeNodeTree(FilterNode *root)
 			FreeNodeTree(root->next[i]);
 			root->next[i] = NULL;
 		}
-		else
-			free(root);
 	}
+			delete root;
 }
 
 void Log2File(const char *outputpath, int dir, int exectime)
@@ -49,7 +48,6 @@ void Log2File(const char *outputpath, int dir, int exectime)
 //build filter
 FilterNode *SliceFilterlst(const char *path, const char *outputpath)
 {
-	//cout << "Please Wait....." << endl;
 	clock_t start_buildtree = clock();
 	char *delim = new char[1];
 	delim[0] = '\n';
@@ -58,13 +56,11 @@ FilterNode *SliceFilterlst(const char *path, const char *outputpath)
 	FilterFileStream.open(path, ios::in);
 	RowFilter << FilterFileStream.rdbuf();
 	FilterFileStream.close();
-	cout << "read filter file complete" << endl;
 	char *Filter = new char[RowFilter.str().length() + 1];
 	std::memset(Filter, 0, sizeof(char) * RowFilter.str().length());
 	memcpy(Filter, RowFilter.str().c_str(), RowFilter.str().length());
 	// profanities list
 	struct FilterNode *root = new FilterNode;
-	struct FilterNode *gg = new FilterNode;
 	root->next[TREE_WIDTH] = 0;
 	std::memset(root->next, 0, sizeof(struct FilterNode *) * TREE_WIDTH);
 	root->data = 0;
@@ -100,7 +96,6 @@ FilterNode *SliceFilterlst(const char *path, const char *outputpath)
 		current = root;
 		FilterSegment = strtok(NULL, delim);
 	}
-	//FreeKeyWordList(list_keyword);
 	clock_t end_buildtree = clock();
 	int exectime = end_buildtree - start_buildtree;
 
@@ -118,7 +113,6 @@ void ProfanitiesRemove(char *input, char *outputpath, struct FilterNode *root)
 	std::memset(output, 0, sizeof(char) * 512);
 	int lastNProfanities;
 	bool shouldReview = false;
-	//cout<< '*';
 	bool hasfind = false, finding = false;
 	for (int i = 0; i < strlen(input);)
 	{	
@@ -167,8 +161,8 @@ void AddFilterlst(const char *path, char *input)
 int main(int argc, char *argv[])
 {
 
-	struct FilterNode *root;
-	root = SliceFilterlst(argv[1], argv[3]);
+	struct FilterNode *filterroot;
+	filterroot = SliceFilterlst(argv[1], argv[3]);
 	ifstream Testcase;
 	Testcase.open(argv[2], ios::in);
 	stringstream line;
@@ -176,7 +170,6 @@ int main(int argc, char *argv[])
 	std::memset(input, 0, sizeof(char) * 512);
 	while (1)
 	{
-		//memcpy(input, line.str().c_str(), line.str().length());
 		Testcase.getline(input, sizeof(input));
 		if (strcmp(input, "#terminate") == 0)
 		{
@@ -189,8 +182,8 @@ int main(int argc, char *argv[])
 			{
 				if (strcmp(input, "#complete") == 0)
 				{
-					FreeNodeTree(root);
-					root = SliceFilterlst(argv[1], argv[3]);
+					FreeNodeTree(filterroot);
+					filterroot = SliceFilterlst(argv[1], argv[3]);
 					break;
 				}
 				else if (strncmp(input, "#", 1))
@@ -204,11 +197,11 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			ProfanitiesRemove(input, argv[3], root);
+			ProfanitiesRemove(input, argv[3], filterroot);
 		}
 		std::memset(input, 0, sizeof(char) * 512);
 	}
 	Testcase.close();
-	FreeNodeTree(root);
+	FreeNodeTree(filterroot);
 	return 0;
 }
